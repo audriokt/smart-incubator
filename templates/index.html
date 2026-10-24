@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Nurse Station - Incubator Sentinel</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --border: #334155;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --blue: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            margin: 0;
+        }
+
+        .header p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .conn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .9rem;
+            color: var(--muted);
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--muted);
+        }
+
+        .dot.ok {
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+        }
+
+        .dot.bad {
+            background: var(--red);
+            box-shadow: 0 0 8px var(--red);
+        }
+
+        .tag {
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: var(--yellow);
+            color: #000;
+            font-weight: bold;
+            font-size: .75rem;
+        }
+
+        .banner {
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background: var(--card);
+            border-left: 8px solid var(--green);
+        }
+
+        .banner .title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: .5px;
+        }
+
+        .banner .sub {
+            color: var(--muted);
+            font-size: .9rem;
+            margin-top: 4px;
+        }
+
+        .banner.warn {
+            border-left-color: var(--yellow);
+        }
+
+        .banner.alarm {
+            border-left-color: var(--red);
+            animation: flash 1s infinite;
+        }
+
+        .banner.code-blue {
+            border-left-color: var(--blue);
+            animation: flash-blue .6s infinite;
+        }
+
+        @keyframes flash {
+            50% {
+                background: #7f1d1d;
+            }
+        }
+
+        @keyframes flash-blue {
+            50% {
+                background: #1e3a8a;
+            }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .2);
+            border: 2px solid transparent;
+            transition: border-color .3s;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .card.alert {
+            border-color: var(--red);
+        }
+
+        .card.warn {
+            border-color: var(--yellow);
+        }
+
+        .card small {
+            color: var(--muted);
+        }
+
+        .metric {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .bar {
+            height: 6px;
+            background: #0b1120;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .bar>div {
+            height: 100%;
+            width: 0;
+            background: var(--green);
+            transition: width .5s, background .3s;
+        }
+
+        .panel {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .panel h3 {
+            margin-top: 0;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+            font-weight: bold;
+            color: #fff;
+            background: var(--blue);
+            transition: filter .2s, opacity .2s;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-warning {
+            background: var(--yellow);
+            color: #000;
+        }
+
+        .btn-danger {
+            background: var(--red);
+        }
+
+        .btn-secondary {
+            background: #475569;
+        }
+
+        .form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .form input {
+            width: 80px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #0b1120;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .feedback {
+            min-height: 1.2em;
+            margin-top: 8px;
+            font-size: .9rem;
+        }
+
+        .feedback.ok {
+            color: var(--green);
+        }
+
+        .feedback.err {
+            color: var(--red);
+        }
+
+        .log-box {
+            background: #0b1120;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            font-size: .85rem;
+            max-height: 240px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .log-box div {
+            padding: 3px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .log-box .t {
+            color: var(--muted);
+            margin-right: 8px;
+        }
+
+        .lv-info {
+            color: #38bdf8;
+        }
+
+        .lv-warn {
+            color: var(--yellow);
+        }
+
+        .lv-alarm {
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            filter: none;
+        }
+
+        .btn-audio {
+            margin: 0;
+            padding: 8px 14px;
+            font-size: .85rem;
+        }
+
+        .btn-audio.on {
+            background: var(--green);
+            color: #000;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .chip {
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: .78rem;
+            font-weight: 700;
+            background: #7f1d1d;
+            color: #fff;
+        }
+
+        .card small.dim {
+            display: block;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header class="header">
+            <div>
+                <h1>CENTRAL NURSE STATION – NICU</h1>
+                <p>Smart Neonatal Incubator Sentinel | Raspberry Pi 5
+                    <span id="sim-tag" class="tag" hidden>SIMULASI</span>
+                </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button id="btn-audio" class="btn btn-secondary btn-audio" onclick="toggleAudio()">
+                    🔇 Audio Monitor: MATI
+                </button>
+                <div class="conn">
+                    <span class="dot" id="conn-dot"></span>
+                    <span id="conn-text">Menghubungkan...</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="banner" id="banner">
+            <div>
+                <div class="title" id="state-title">MEMUAT...</div>
+                <div class="sub" id="state-sub">Menunggu telemetri inkubator</div>
+                <div class="chips" id="alerts"></div>
+            </div>
+            <div id="notice-protocol"
+                style="font-size: 0.85rem; color: var(--muted); max-width: 320px; text-align: right;">
+                Protokol Fisik: buzzer boks hanya dapat dimatikan dengan menahan tombol fisik di inkubator.
+            </div>
+        </section>
+
+        <main id="dashboard">
+            <div class="grid">
+                <div class="card" id="card-temp">
+                    <h3>Suhu Inkubator</h3>
+                    <div class="metric" id="temp-val">--.- °C</div>
+                    <small>Batas aman: <span id="target-temp">--</span> °C · <span id="sensor-status">--</span></small>
+                </div>
+                <div class="card" id="card-hum">
+                    <h3>Kelembaban (RH)</h3>
+                    <div class="metric" id="hum-val">-- %</div>
+                    <small>Batas aman: <span id="target-hum">--</span> %</small>
+                    <small class="dim" id="hum-age">belum ada data</small>
+                </div>
+                <div class="card" id="card-motion">
+                    <h3>Aktivitas Motorik (PIR)</h3>
+                    <div class="metric" id="motion-val">--</div>
+                    <small>Inaktif: <span id="inactive-val">0</span> / <span id="inactivity-limit">120</span>
+                        detik</small>
+                    <div class="bar">
+                        <div id="inactivity-bar"></div>
+                    </div>
+                    <small class="dim">Pin PIR: <b id="pir-raw">--</b> · terdeteksi <b id="motion-events">0</b>×</small>
+                </div>
+                <div class="card" id="card-sound">
+                    <h3>Tangisan (Sensor Suara)</h3>
+                    <div class="metric" id="sound-val">--</div>
+                    <small id="sound-age">belum ada suara</small>
+                </div>
+            </div>
+
+            <section class="panel">
+                <h3>Panel Tindakan Perawat (Clinical Tele-Care)</h3>
+                <button class="btn btn-warning" id="btn-wake" onclick="triggerWakeBaby()">BANGUNKAN BAYI (JADWAL
+                    SUSU)</button>
+                <button class="btn btn-danger" id="btn-codeblue">TRIGGER CODE BLUE</button>
+                <div class="feedback" id="feedback"></div>
+
+                <h3 style="margin-bottom:0">Riwayat Kejadian Klinis</h3>
+                <div class="log-box" id="system-log">Menunggu data sistem...</div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const POLL_MS = 1000, TIMEOUT_MS = 3000, MAX_FAIL = 3;
+        const BASE_TITLE = document.title;
+        const $ = (id) => document.getElementById(id);
+        let failCount = 0, lastStatus = null, logSig = '', fbTimer;
+        let connLost = false;
+
+        // ================= WEB AUDIO API (ALARM DI PERANGKAT PERAWAT) =================
+        // Bisa dinyalakan/dimatikan. Saat aktif, bunyi HANYA muncul bila ada peringatan,
+        // berulang dengan jeda (bukan terus-menerus), dan berhenti otomatis saat peringatan hilang.
+        let audioCtx = null, audioOn = false, lastAlarmAt = 0;
+
+        function updateAudioBtn() {
+            const b = $('btn-audio');
+            b.textContent = audioOn ? '🔊 Audio Monitor: AKTIF' : '🔇 Audio Monitor: MATI';
+            b.classList.toggle('on', audioOn);
+        }
+
+        function toggleAudio() {
+            if (audioOn) {
+                audioOn = false;
+                lastAlarmAt = 0;
+            } else {
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    audioOn = true;
+                    lastAlarmAt = 0;
+                    playBeep(880, 0.1); // nada konfirmasi singkat
+                } catch (err) {
+                    console.error('Audio error:', err);
+                    feedback('Browser ini tidak mendukung Web Audio.', false);
+                }
+            }
+            updateAudioBtn();
+        }
+
+        function playBeep(frequency, duration) {
+            if (!audioCtx) return;
+            try {
+                const t0 = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(frequency, t0);
+                gain.gain.setValueAtTime(0.25, t0);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(t0);
+                osc.stop(t0 + duration);
+            } catch (err) {
+                console.error('Audio error:', err);
+            }
+        }
+
+        // Prioritas: koneksi putus > CODE BLUE > inaktivitas > suhu > kelembapan.
+        // Jadwal susu & tangisan hanya notifikasi visual (tanpa suara).
+        function currentAlarm() {
+            if (connLost) return { f: 450, dur: 0.4, period: 3000 };
+            const d = lastStatus;
+            if (!d) return null;
+            if (d.emergency) return { f: 1200, dur: 0.15, period: 700 };
+            if (d.inactivity_alarm) return { f: 950, dur: 0.35, period: 2000 };
+            if (d.thermal_alarm) return { f: 750, dur: 0.25, period: 2000 };
+            if (d.humidity_alarm) return { f: 650, dur: 0.25, period: 2500 };
+            return null;
+        }
+
+        function alarmTick() {
+            const a = currentAlarm();
+            if (!a) { lastAlarmAt = 0; return; }
+            if (!audioOn) return;
+            const now = Date.now();
+            if (now - lastAlarmAt >= a.period) {
+                lastAlarmAt = now;
+                playBeep(a.f, a.dur);
+            }
+        }
+        setInterval(alarmTick, 250);
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && audioOn && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        });
+
+        // ================= TAMPILAN STATUS =================
+        const STATE_INFO = {
+            IDLE_NORMAL: { title: 'NORMAL', sub: 'Mikroklimat dan aktivitas neonatus dalam kondisi aman', cls: '' },
+            CRYING_DISTRESS: { title: 'BAYI MENANGIS', sub: 'Sensor suara mendeteksi tangisan – periksa kenyamanan bayi', cls: 'warn' },
+            SENSOR_FAULT: { title: 'GANGGUAN SENSOR', sub: 'Sensor DHT11 tidak merespons – periksa kabel', cls: 'warn' },
+            HUMIDITY_HAZARD: { title: 'KELEMBAPAN DI LUAR BATAS', sub: 'LED merah boks berkedip. Boks hening; peringatan hanya di layar ini.', cls: 'alarm' },
+            THERMAL_HAZARD: { title: 'BAHAYA TERMAL INKUBATOR', sub: 'LED merah boks berkedip. Boks hening; peringatan hanya di layar ini.', cls: 'alarm' },
+            FEEDING_WAKE: { title: 'STIMULASI JADWAL SUSU', sub: 'Buzzer boks menyala. Tekan dan tahan tombol fisik di inkubator untuk mematikan.', cls: 'warn' },
+            INACTIVITY_ALERT: { title: 'PEMERIKSAAN INAKTIVITAS (≥ 2 MENIT)', sub: 'Bayi tidak bergerak. Buzzer boks menyala; perawat wajib memeriksa langsung ke inkubator.', cls: 'alarm' },
+            CODE_BLUE: { title: 'CODE BLUE - KEGAWATDARURATAN', sub: 'Panggilan darurat aktif. Buzzer hanya dapat dimatikan via tombol fisik di boks.', cls: 'code-blue' },
+        };
+
+        const fmt = (v, d) => (typeof v === 'number' && isFinite(v)) ? v.toFixed(d) : '--';
+
+        async function api(url, options = {}) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+            try {
+                const res = await fetch(url, { ...options, signal: ctrl.signal });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    const e = new Error(body.message || `HTTP ${res.status}`);
+                    e.status = res.status;
+                    throw e;
+                }
+                return body;
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        function setConn(ok) {
+            connLost = !ok;
+            $('conn-dot').className = 'dot ' + (ok ? 'ok' : 'bad');
+            $('conn-text').textContent = ok ? `Terhubung · ${new Date().toLocaleTimeString('id-ID')}` : 'TERPUTUS dari Inkubator!';
+            if (!ok) {
+                $('banner').className = 'banner alarm';
+                $('state-title').textContent = 'KONEKSI TERPUTUS';
+                $('state-sub').textContent = 'Kehilangan telemetri – periksa kondisi inkubator secara manual!';
+            }
+        }
+
+        function render(d) {
+            lastStatus = d;
+            const c = d.config;
+            const info = STATE_INFO[d.state] || { title: d.state, sub: '', cls: 'alarm' };
+            const alarmOn = d.state !== 'IDLE_NORMAL';
+
+            $('banner').className = 'banner ' + info.cls;
+            $('state-title').textContent = info.title;
+            $('state-sub').textContent = info.sub;
+            document.title = alarmOn ? `⚠ ${info.title} – ${BASE_TITLE}` : BASE_TITLE;
+            $('sim-tag').hidden = !d.simulation;
+            $('alerts').replaceChildren(...(d.active_alerts || []).map((a) => {
+                const s = document.createElement('span');
+                s.className = 'chip';
+                s.textContent = a;
+                return s;
+            }));
+
+            // Suhu
+            const tempEl = $('temp-val');
+            tempEl.textContent = `${fmt(d.temperature, 1)} °C`;
+            tempEl.style.color = !d.sensor_ok ? 'var(--muted)' : d.thermal_alarm ? 'var(--red)' : 'var(--green)';
+            $('target-temp').textContent = `${fmt(d.temp_threshold_low, 1)} – ${fmt(d.temp_threshold_high, 1)}`;
+            $('sensor-status').textContent = d.sensor_ok ? 'Sensor OK' : 'SENSOR ERROR';
+            $('card-temp').className = 'card' + (d.thermal_alarm ? ' alert' : !d.sensor_ok ? ' warn' : '');
+
+            // Kelembapan
+            const humEl = $('hum-val');
+            humEl.textContent = `${fmt(d.humidity, 0)} %`;
+            humEl.style.color = !d.sensor_ok ? 'var(--muted)' : d.humidity_alarm ? 'var(--red)' : 'var(--green)';
+            $('target-hum').textContent = `${fmt(d.hum_threshold_low, 0)} – ${fmt(d.hum_threshold_high, 0)}`;
+            $('hum-age').textContent = d.sensor_age_seconds == null ? 'belum ada data' : `diperbarui ${fmt(d.sensor_age_seconds, 0)} s lalu`;
+            $('card-hum').className = 'card' + (d.humidity_alarm ? ' alert' : !d.sensor_ok ? ' warn' : '');
+
+            // Gerak / inaktivitas
+            const inact = d.inactivity_seconds;
+            const level = d.inactivity_alarm ? 'alert' : inact >= c.inactivity_warning ? 'warn' : '';
+            const levelColor = { alert: 'var(--red)', warn: 'var(--yellow)', '': 'var(--green)' }[level];
+            const motionEl = $('motion-val');
+            motionEl.textContent = d.motion ? 'AKTIF' : 'DIAM';
+            motionEl.style.color = d.motion ? 'var(--green)' : (level ? levelColor : 'var(--text)');
+            $('inactive-val').textContent = inact;
+            $('inactivity-limit').textContent = c.inactivity_timeout;
+            $('inactivity-bar').style.width = Math.min(100, (inact / c.inactivity_timeout) * 100) + '%';
+            $('inactivity-bar').style.background = levelColor;
+            $('pir-raw').textContent = d.pir_raw ? 'HIGH' : 'LOW';
+            $('motion-events').textContent = d.motion_events;
+            $('card-motion').className = 'card ' + level;
+
+            // Tangisan
+            const soundEl = $('sound-val');
+            soundEl.textContent = d.crying ? 'MENANGIS' : 'TENANG';
+            soundEl.style.color = d.crying ? 'var(--yellow)' : 'var(--green)';
+            $('sound-age').textContent = d.last_cry_ago == null ? 'belum ada suara' : `suara terakhir ${d.last_cry_ago} s lalu`;
+            $('card-sound').className = 'card' + (d.crying ? ' warn' : '');
+
+            // Tombol kontrol (buzzer hanya bisa dimatikan lewat tombol fisik)
+            const buzzerActive = d.feeding_wake || d.inactivity_alarm || d.emergency;
+            $('btn-wake').disabled = buzzerActive;
+            $('btn-wake').textContent = buzzerActive ? 'BUZZER AKTIF – TEKAN TOMBOL FISIK' : 'BANGUNKAN BAYI (JADWAL SUSU)';
+            $('btn-codeblue').disabled = d.emergency;
+            $('btn-codeblue').textContent = d.emergency ? 'CODE BLUE AKTIF (MATIKAN DI TOMBOL FISIK)' : 'TRIGGER CODE BLUE';
+
+            renderLogs(d.logs || []);
+        }
+
+        function renderLogs(logs) {
+            const sig = logs.length + '|' + (logs[0] ? logs[0].time + logs[0].msg : '');
+            if (sig === logSig) return;
+            logSig = sig;
+            $('system-log').replaceChildren(...logs.map((e) => {
+                const row = document.createElement('div');
+                const t = document.createElement('span');
+                t.className = 't';
+                t.textContent = e.time;
+                const m = document.createElement('span');
+                m.className = 'lv-' + e.level;
+                m.textContent = e.msg;
+                row.append(t, m);
+                return row;
+            }));
+        }
+
+        async function poll() {
+            try {
+                render(await api('/api/status'));
+                failCount = 0;
+                setConn(true);
+            } catch (err) {
+                console.error('Telemetri gagal:', err);
+                if (++failCount >= MAX_FAIL) setConn(false);
+            } finally {
+                setTimeout(poll, POLL_MS);
+            }
+        }
+
+        function feedback(msg, ok) {
+            const el = $('feedback');
+            el.textContent = msg;
+            el.className = 'feedback ' + (ok ? 'ok' : 'err');
+            clearTimeout(fbTimer);
+            fbTimer = setTimeout(() => { el.textContent = ''; }, 5000);
+        }
+
+        // ================= PERINTAH KONTROL (dengan token opsional) =================
+        function getToken() { try { return sessionStorage.getItem('sentinel_token') || ''; } catch (e) { return ''; } }
+        function setToken(t) { try { sessionStorage.setItem('sentinel_token', t); } catch (e) { /* abaikan */ } }
+
+        async function sendControl(payload) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (lastStatus && lastStatus.auth_required) {
+                let tok = getToken();
+                if (!tok) {
+                    tok = prompt('Masukkan token perawat:') || '';
+                    if (!tok) { feedback('Token diperlukan untuk perintah kontrol.', false); return false; }
+                    setToken(tok);
+                }
+                headers['X-Auth-Token'] = tok;
+            }
+            try {
+                const r = await api('/api/control', { method: 'POST', headers, body: JSON.stringify(payload) });
+                feedback(r.message, true);
+                if (r.data) render(r.data);
+                return true;
+            } catch (err) {
+                if (err.status === 401) setToken('');
+                feedback(err.name === 'AbortError' ? 'Inkubator tidak merespons.' : err.message, false);
+                return false;
+            }
+        }
+
+        function triggerWakeBaby() {
+            if (confirm('Bunyikan buzzer di inkubator untuk membangunkan bayi (jadwal susu)?\nBuzzer hanya bisa dimatikan dengan tombol fisik di inkubator.')) {
+                sendControl({ action: 'wake_baby' });
+            }
+        }
+
+        $('btn-codeblue').addEventListener('click', () => {
+            if (confirm('PICU CODE BLUE? Buzzer inkubator akan berbunyi dan hanya bisa dimatikan via tombol fisik!')) {
+                sendControl({ action: 'emergency_alert' });
+            }
+        });
+
+        poll();
+    </script>
+</body>
+
+</html>
